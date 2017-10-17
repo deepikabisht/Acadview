@@ -72,6 +72,23 @@ def get_own_post():
     else:
         print 'Status code other than 200 received!'
 
+# Function to fetch recent post of user by username
+
+def get_user_post(insta_username):
+    user_id=get_user_id(insta_username)
+    if(user_id==None):
+        print 'User does not exists'
+        exit()
+    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id,APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    user_media = requests.get(request_url).json()
+    if(user_media['meta']['code']==200):
+        if len(user_media['data']):
+            print user_media['data'][0]['id']
+        else:
+            print  'Post does not exists'
+    else:
+        print 'Status code other than 200 received!'
 
 
 # InstaBot menu
@@ -84,6 +101,7 @@ def start_bot():
         print "a.Get your own details\n"
         print "b.Get details of a user by username\n"
         print "c.Get your own recent post\n"
+        print "d.Get recent post of a user by username\n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -94,6 +112,9 @@ def start_bot():
             get_user_info(insta_username)
         elif choice=="c":
             get_own_post()
+        elif choice=="d":
+            insta_username= raw_input("Enter the username of the user : ")
+            get_user_post(insta_username)
         elif choice=="j":
             exit()
         else:
