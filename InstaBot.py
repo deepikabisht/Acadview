@@ -57,7 +57,26 @@ def get_user_info(insta_username):
     else:
         print 'Status code other than 200 received!'
 
+# InstaBot menu
 
-#self_info()
-#get_user_id('rajat8310')
-get_user_info('rajat8310')
+def start_bot():
+    while True:
+        print '\n'
+        print 'Hey! Welcome to instaBot!'
+        print 'Here are your menu options:'
+        print "a.Get your own details\n"
+        print "b.Get details of a user by username\n"
+        print "j.Exit"
+
+        choice=raw_input("Enter you choice: ")
+        if choice=="a":
+            self_info()
+        elif choice=="b":
+            insta_username = raw_input("Enter the username of the user: ")
+            get_user_info(insta_username)
+        elif choice=="j":
+            exit()
+        else:
+            print "wrong choice"
+
+start_bot()
