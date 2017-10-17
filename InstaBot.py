@@ -1,4 +1,6 @@
 import requests
+import urllib
+
 BASE_URL= 'https://api.instagram.com/v1/'
 APP_ACCESS_TOKEN= '4870715640.a48e759.874aba351e5147eca8a9d36b9688f494'
 #APP_ACCESS_TOKEN = '5629236876.1cc9688.86db895c038043b5960dc2949785299a'
@@ -66,7 +68,11 @@ def get_own_post():
     own_media = requests.get(request_url).json()
     if(own_media['meta']['code']==200):
         if len(own_media['data']):
-            print own_media['data'][0]['id']
+            image_name = own_media['data'][0]['id'] + '.jpeg'
+            image_url = own_media['data'][0]['images']['standard_resolution']['url']
+            urllib.urlretrieve(image_url, image_name)
+            print 'Your image has been downloaded!'
+
         else:
             print  'Post does not exists'
     else:
