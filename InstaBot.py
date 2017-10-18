@@ -94,6 +94,24 @@ def get_user_post(insta_username):
             image_url = user_media['data'][0]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url, image_name)
             print 'Your image has been downloaded!'
+
+
+        else:
+            print  'Post does not exists'
+    else:
+        print 'Status code other than 200 received!'
+
+#Function to fetch user post id by username
+def get_post_id(insta_username):
+    user_id = get_user_id(insta_username)
+    if (user_id == None):
+        print 'User does not exists'
+        exit()
+    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    user_media = requests.get(request_url).json()
+    if (user_media['meta']['code'] == 200):
+        if len(user_media['data']):
             return user_media['data'][0]['id']
 
         else:
@@ -101,10 +119,11 @@ def get_user_post(insta_username):
     else:
         print 'Status code other than 200 received!'
 
+
 #Function to like a post of a user by username
 
 def like_a_post(insta_username):
-    media_id= get_user_post(insta_username)
+    media_id= get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/likes') % (media_id)
     payload = {"access_token": APP_ACCESS_TOKEN}
     print 'POST request url : %s' % (request_url)
@@ -113,6 +132,19 @@ def like_a_post(insta_username):
         print 'Like was successful'
     else:
         print 'Your like was unsuccessful. Try again!'
+
+#Function to make a comment on user post by username
+def post_a_comment(insta_username):
+    media_id=get_post_id(insta_username)
+    comment_text= raw_input("Enter a comment")
+    payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_text}
+    request_url = (BASE_URL + 'media/%s/comments') % (media_id)
+    print 'POST request url : %s' % (request_url)
+    make_comment = requests.post(request_url, payload).json()
+    if (make_comment['meta']['code'] == 200):
+        print 'Successfully added a new comment'
+    else:
+        print 'Your comment was unsuccessful. Try again!'
 
 
 # InstaBot menu
@@ -127,6 +159,7 @@ def start_bot():
         print "c.Get your own recent post\n"
         print "d.Get recent post of a user by username\n"
         print "e.Like a post of a user by username \n"
+        print "f.Make a comment in user post by username \n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -143,6 +176,9 @@ def start_bot():
         elif choice=="e":
             insta_username = raw_input("Enter the username of the user : ")
             like_a_post(insta_username)
+        elif choice=="f":
+            insta_username = raw_input("Enter the username of the user : ")
+            post_a_comment(insta_username)
         elif choice=="j":
             exit()
         else:
