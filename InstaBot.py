@@ -101,6 +101,25 @@ def get_user_post(insta_username):
     else:
         print 'Status code other than 200 received!'
 
+
+# Function to get the list of people who have liked user post by username
+def get_like_list(insta_username):
+    media_id=get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/likes?access_token=%s') % (media_id,APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    user_like = requests.get(request_url).json()
+    if (user_like['meta']['code'] == 200):
+        if len(user_like['data']):
+            print 'Username: %s' % (user_like['data'][0]['username'])
+            print 'Full name: %s' % (user_like['data'][0]['full_name'])
+            print 'Id: %s' % (user_like['data'][0]['id'])
+
+        else:
+            print  'Post does not exists'
+    else:
+        print 'Status code other than 200 received!'
+
+
 #Function to fetch user post id by username
 def get_post_id(insta_username):
     user_id = get_user_id(insta_username)
@@ -133,6 +152,7 @@ def like_a_post(insta_username):
     else:
         print 'Your like was unsuccessful. Try again!'
 
+
 #Function to make a comment on user post by username
 def post_a_comment(insta_username):
     media_id=get_post_id(insta_username)
@@ -158,8 +178,9 @@ def start_bot():
         print "b.Get details of a user by username\n"
         print "c.Get your own recent post\n"
         print "d.Get recent post of a user by username\n"
-        print "e.Like a post of a user by username \n"
-        print "f.Make a comment in user post by username \n"
+        print "e.Get the list of user who liked user post by username\n"
+        print "f.Like a post of a user by username \n"
+        print "g.Make a comment in user post by username \n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -174,9 +195,12 @@ def start_bot():
             insta_username= raw_input("Enter the username of the user : ")
             get_user_post(insta_username)
         elif choice=="e":
+            insta_username= raw_input("Enter the username of the user : ")
+            get_like_list(insta_username)
+        elif choice=="f":
             insta_username = raw_input("Enter the username of the user : ")
             like_a_post(insta_username)
-        elif choice=="f":
+        elif choice=="g":
             insta_username = raw_input("Enter the username of the user : ")
             post_a_comment(insta_username)
         elif choice=="j":
