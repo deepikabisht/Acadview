@@ -110,9 +110,12 @@ def get_like_list(insta_username):
     user_like = requests.get(request_url).json()
     if (user_like['meta']['code'] == 200):
         if len(user_like['data']):
-            print 'Username: %s' % (user_like['data'][0]['username'])
-            print 'Full name: %s' % (user_like['data'][0]['full_name'])
-            print 'Id: %s' % (user_like['data'][0]['id'])
+            c=len(user_like['data'])
+            while(c!=0):
+                print 'Username: %s' % (user_like['data'][0]['username'])
+                print 'Full name: %s' % (user_like['data'][0]['full_name'])
+                print 'Id: %s' % (user_like['data'][0]['id'])
+                c=c-1
 
         else:
             print  'Post does not exists'
@@ -152,6 +155,32 @@ def like_a_post(insta_username):
     else:
         print 'Your like was unsuccessful. Try again!'
 
+# Function to get the list of comments on user post by username
+
+def get_comment_list(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    user_comment = requests.get(request_url).json()
+    if (user_comment['meta']['code'] == 200):
+        if len(user_comment['data']):
+            c = len(user_comment['data'])
+            print c
+            i=0
+            while (c != 0):
+                print i+1
+                print 'Comment from: %s' % (user_comment['data'][i]['from']['username'])
+                print 'Comment text : %s' % (user_comment['data'][i]['text'])
+                print 'Comment Id: %s' % (user_comment['data'][i]['id'])
+                i=i+1
+                c = c - 1
+
+
+        else:
+            print  'Post does not exists'
+    else:
+        print 'Status code other than 200 received!'
+
 
 #Function to make a comment on user post by username
 def post_a_comment(insta_username):
@@ -180,7 +209,8 @@ def start_bot():
         print "d.Get recent post of a user by username\n"
         print "e.Get the list of user who liked user post by username\n"
         print "f.Like a post of a user by username \n"
-        print "g.Make a comment in user post by username \n"
+        print "g.Get the list of comment in post by username \n"
+        print "h.Make a comment in user post by username \n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -201,6 +231,9 @@ def start_bot():
             insta_username = raw_input("Enter the username of the user : ")
             like_a_post(insta_username)
         elif choice=="g":
+            insta_username = raw_input("Enter the username of the user : ")
+            get_comment_list(insta_username)
+        elif choice=="h":
             insta_username = raw_input("Enter the username of the user : ")
             post_a_comment(insta_username)
         elif choice=="j":
