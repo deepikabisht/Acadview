@@ -94,11 +94,25 @@ def get_user_post(insta_username):
             image_url = user_media['data'][0]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url, image_name)
             print 'Your image has been downloaded!'
+            return user_media['data'][0]['id']
 
         else:
             print  'Post does not exists'
     else:
         print 'Status code other than 200 received!'
+
+#Function to like a post of a user by username
+
+def like_a_post(insta_username):
+    media_id= get_user_post(insta_username)
+    request_url = (BASE_URL + 'media/%s/likes') % (media_id)
+    payload = {"access_token": APP_ACCESS_TOKEN}
+    print 'POST request url : %s' % (request_url)
+    post_a_like = requests.post(request_url, payload).json()
+    if (post_a_like['meta']['code']==200):
+        print 'Like was successful'
+    else:
+        print 'Your like was unsuccessful. Try again!'
 
 
 # InstaBot menu
@@ -112,6 +126,7 @@ def start_bot():
         print "b.Get details of a user by username\n"
         print "c.Get your own recent post\n"
         print "d.Get recent post of a user by username\n"
+        print "e.Like a post of a user by username \n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -125,6 +140,9 @@ def start_bot():
         elif choice=="d":
             insta_username= raw_input("Enter the username of the user : ")
             get_user_post(insta_username)
+        elif choice=="e":
+            insta_username = raw_input("Enter the username of the user : ")
+            like_a_post(insta_username)
         elif choice=="j":
             exit()
         else:
