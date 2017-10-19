@@ -1,5 +1,7 @@
 import requests
 import urllib
+from textblob import TextBlob
+from textblob.sentiments import NaiveBayesAnalyzer
 
 BASE_URL= 'https://api.instagram.com/v1/'
 APP_ACCESS_TOKEN= '4870715640.a48e759.874aba351e5147eca8a9d36b9688f494'
@@ -195,6 +197,30 @@ def post_a_comment(insta_username):
     else:
         print 'Your comment was unsuccessful. Try again!'
 
+#Function to delete negative comments
+
+def delete_negative_comment(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    comment_info = requests.get(request_url).json()
+    if (comment_info['meta']['code'] == 200):
+        if len(comment_info['data']):
+            c=len(comment_info['data'])
+            i=0
+            while(c!=0):
+                blob = TextBlob(comment_info['data'][i]['text'], analyzer=NaiveBayesAnalyzer())
+                print blob.sentiment[0]
+
+
+                i=i+1
+                c=c-1
+
+        else:
+            print 'There are no existing comments on the post!'
+    else:
+        print 'Status code other than 200 received!'
+
 
 # InstaBot menu
 
@@ -211,6 +237,7 @@ def start_bot():
         print "f.Like a post of a user by username \n"
         print "g.Get the list of comment in post by username \n"
         print "h.Make a comment in user post by username \n"
+        print "i.Delete negative comments \n"
         print "j.Exit"
 
         choice=raw_input("Enter you choice: ")
@@ -236,6 +263,9 @@ def start_bot():
         elif choice=="h":
             insta_username = raw_input("Enter the username of the user : ")
             post_a_comment(insta_username)
+        elif choice=="i":
+            insta_username = raw_input("Enter the username of the user : ")
+            delete_negative_comment(insta_username)
         elif choice=="j":
             exit()
         else:
