@@ -208,18 +208,30 @@ def delete_negative_comment(insta_username):
         if len(comment_info['data']):
             c=len(comment_info['data'])
             i=0
+            j=0
             while(c!=0):
                 blob = TextBlob(comment_info['data'][i]['text'], analyzer=NaiveBayesAnalyzer())
-                print blob.sentiment[0]
-
+                if(blob.sentiment[0]=='neg'):
+                    j=j+1
+                    comment_id=comment_info['data'][i]['id']
+                    del_url= (BASE_URL + 'media/%s/comments/%s?access_token=%s') %(media_id,comment_id,APP_ACCESS_TOKEN)
+                    del_info= requests.delete(del_url).json()
+                    if(del_info['meta']['code']==200):
+                        print 'Comment deleted successfully'
+                    else:
+                        print 'Comment not deleted '
 
                 i=i+1
                 c=c-1
+            if(j==0):
+                print 'No negative comments'
 
         else:
             print 'There are no existing comments on the post!'
     else:
         print 'Status code other than 200 received!'
+    new_request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'New GET request url : %s' % (request_url)
 
 
 # InstaBot menu
