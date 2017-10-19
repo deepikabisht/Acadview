@@ -132,7 +132,6 @@ def get_post_id(insta_username):
         print 'User does not exists'
         exit()
     request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
     user_media = requests.get(request_url).json()
     if (user_media['meta']['code'] == 200):
         if len(user_media['data']):
@@ -202,7 +201,6 @@ def post_a_comment(insta_username):
 def delete_negative_comment(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
     comment_info = requests.get(request_url).json()
     if (comment_info['meta']['code'] == 200):
         if len(comment_info['data']):
@@ -231,13 +229,13 @@ def delete_negative_comment(insta_username):
     else:
         print 'Status code other than 200 received!'
     new_request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
-    print 'New GET request url : %s' % (request_url)
+    print ' GET request url : %s' % (request_url)
 
 #Function to delete comments with particular word
+
 def delete_using_word(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
     comment_info = requests.get(request_url).json()
     if (comment_info['meta']['code'] == 200):
         if len(comment_info['data']):
@@ -245,20 +243,40 @@ def delete_using_word(insta_username):
             del_word = raw_input("enter the word : ")
             i = 0
             j = 0
+            m = 0
             while (c != 0):
                 s=comment_info['data'][i]['text']
                 if del_word in s:
                     j=j+1
-                    print 'Success'
+                    comment_id = comment_info['data'][i]['id']
+                    del_url = (BASE_URL + 'media/%s/comments/%s?access_token=%s') % (media_id,comment_id,APP_ACCESS_TOKEN)
+                    del_info = requests.delete(del_url).json()
+                    if (del_info['meta']['code'] == 200):
+                        #print 'Comment deleted successfully'
+                        m=m+1
+                    else:
+                        #print 'Comment not deleted '
+                        m=0
+
                 i=i+1
                 c=c-1
-
+            if(m>0):
+                print 'Comment with %s  word deleted successfully' % (del_word)
+            elif(m==0):
+                print  'Comment with %s word cannot be deleted' % (del_word)
+            else:
+                pass
             if(j==0):
                 print  'No such word in the comments'
         else:
             print 'There are no existing comments on the post!'
     else:
         print 'Status code other than 200 received!'
+
+
+    print 'GET request url : %s' % (request_url)
+
+
 
 # InstaBot menu
 
