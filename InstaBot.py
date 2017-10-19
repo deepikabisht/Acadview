@@ -233,6 +233,32 @@ def delete_negative_comment(insta_username):
     new_request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
     print 'New GET request url : %s' % (request_url)
 
+#Function to delete comments with particular word
+def delete_using_word(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    comment_info = requests.get(request_url).json()
+    if (comment_info['meta']['code'] == 200):
+        if len(comment_info['data']):
+            c = len(comment_info['data'])
+            del_word = raw_input("enter the word : ")
+            i = 0
+            j = 0
+            while (c != 0):
+                s=comment_info['data'][i]['text']
+                if del_word in s:
+                    j=j+1
+                    print 'Success'
+                i=i+1
+                c=c-1
+
+            if(j==0):
+                print  'No such word in the comments'
+        else:
+            print 'There are no existing comments on the post!'
+    else:
+        print 'Status code other than 200 received!'
 
 # InstaBot menu
 
@@ -250,7 +276,8 @@ def start_bot():
         print "g.Get the list of comment in post by username \n"
         print "h.Make a comment in user post by username \n"
         print "i.Delete negative comments \n"
-        print "j.Exit"
+        print "j.Delete comments with the particular word \n"
+        print "k.Exit"
 
         choice=raw_input("Enter you choice: ")
         if choice=="a":
@@ -278,7 +305,11 @@ def start_bot():
         elif choice=="i":
             insta_username = raw_input("Enter the username of the user : ")
             delete_negative_comment(insta_username)
-        elif choice=="j":
+        elif choice == "j":
+            insta_username = raw_input("Enter the username of the user : ")
+            delete_using_word(insta_username)
+
+        elif choice=="k":
             exit()
         else:
             print "wrong choice"
