@@ -5,16 +5,15 @@ from textblob.sentiments import NaiveBayesAnalyzer
 
 BASE_URL= 'https://api.instagram.com/v1/'
 APP_ACCESS_TOKEN= '4870715640.a48e759.874aba351e5147eca8a9d36b9688f494'
-#APP_ACCESS_TOKEN = '5629236876.1cc9688.86db895c038043b5960dc2949785299a'
+
 
 #Function to get own info
-
 def self_info():
     request_url= (BASE_URL + 'users/self/?access_token=%s') % (APP_ACCESS_TOKEN)
     print 'GET request url : %s' % (request_url)
-    user_info = requests.get(request_url).json()
+    user_info = requests.get(request_url).json() #converts in json
 
-    if user_info['meta']['code'] == 200:
+    if (user_info['meta']['code'] == 200): #check for status code
         if len(user_info['data']):
             print 'Username: %s' % (user_info['data']['username'])
             print 'No. of followers: %s' % (user_info['data']['counts']['followed_by'])
@@ -25,8 +24,8 @@ def self_info():
     else:
         print 'Status code other than 200 received!'
 
-#Function to get user_id
 
+#Function to get user_id
 def get_user_id(insta_username):
     request_url= (BASE_URL + 'users/search?q=%s&access_token=%s') % (insta_username, APP_ACCESS_TOKEN)
     print 'GET request url : %s' % (request_url)
@@ -40,8 +39,8 @@ def get_user_id(insta_username):
         print 'Status code other than 200 received!'
         exit()
 
-# Function to get user information
 
+# Function to get user information
 def get_user_info(insta_username):
     user_id=get_user_id(insta_username)
     if(user_id==None):
@@ -62,8 +61,8 @@ def get_user_info(insta_username):
     else:
         print 'Status code other than 200 received!'
 
-#Function to download our  own posted image
 
+#Function to download our  own posted image
 def get_own_post():
     request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (APP_ACCESS_TOKEN)
     print 'GET request url : %s' % (request_url)
@@ -80,8 +79,8 @@ def get_own_post():
     else:
         print 'Status code other than 200 received!'
 
-# Function to fetch recent image  posted by user with minimum no of likes
 
+# Function to fetch recent image  posted by user with minimum no of likes
 def get_user_post(insta_username):
     user_id=get_user_id(insta_username)
     if(user_id==None):
@@ -97,16 +96,15 @@ def get_user_post(insta_username):
             m=(user_media['data'][0]['likes']['count'])
             c=c-1
             while(c!=0):
-                 if(m>=(user_media['data'][i]['likes']['count'])):
+                 if(m>=(user_media['data'][i]['likes']['count'])): #checking for minimum no. of likes
                      m=(user_media['data'][i]['likes']['count'])
                      j=i
                  i=i+1
                  c=c-1
 
-            print j
             image_name = user_media['data'][j]['id'] + '.jpeg'
             image_url = user_media['data'][j]['images']['standard_resolution']['url']
-            urllib.urlretrieve(image_url, image_name)
+            urllib.urlretrieve(image_url, image_name)  #downloading the image
             print 'Your image has been downloaded!'
 
 
@@ -156,7 +154,6 @@ def get_post_id(insta_username):
 
 
 #Function to like a post of a user by username
-
 def like_a_post(insta_username):
     media_id= get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/likes') % (media_id)
@@ -168,8 +165,8 @@ def like_a_post(insta_username):
     else:
         print 'Your like was unsuccessful. Try again!'
 
-# Function to get the list of comments on user post by username
 
+# Function to get the list of comments on user post by username
 def get_comment_list(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/comments?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
@@ -182,6 +179,7 @@ def get_comment_list(insta_username):
             i=0
             while (c != 0):
                 print i+1
+                # printing comments detail
                 print 'Comment from: %s' % (user_comment['data'][i]['from']['username'])
                 print 'Comment text : %s' % (user_comment['data'][i]['text'])
                 print 'Comment Id: %s' % (user_comment['data'][i]['id'])
@@ -208,8 +206,8 @@ def post_a_comment(insta_username):
     else:
         print 'Your comment was unsuccessful. Try again!'
 
-#Function to delete negative comments
 
+#Function to delete negative comments
 def delete_negative_comment(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
@@ -220,8 +218,8 @@ def delete_negative_comment(insta_username):
             i=0
             j=0
             while(c!=0):
-                blob = TextBlob(comment_info['data'][i]['text'], analyzer=NaiveBayesAnalyzer())
-                if(blob.sentiment[0]=='neg'):
+                blob = TextBlob(comment_info['data'][i]['text'], analyzer=NaiveBayesAnalyzer()) #analyzes the comment whether positive or negative
+                if(blob.sentiment[0]=='neg'): #checking if any negative comments
                     j=j+1
                     comment_id=comment_info['data'][i]['id']
                     del_url= (BASE_URL + 'media/%s/comments/%s?access_token=%s') %(media_id,comment_id,APP_ACCESS_TOKEN)
@@ -242,8 +240,8 @@ def delete_negative_comment(insta_username):
         print 'Status code other than 200 received!'
     print ' GET request url : %s' % (request_url)
 
-#Function to delete comments with particular word
 
+#Function to delete comments with particular word
 def delete_using_word(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
@@ -287,7 +285,6 @@ def delete_using_word(insta_username):
 
 
 # InstaBot menu
-
 def start_bot():
     while True:
         print '\n'
