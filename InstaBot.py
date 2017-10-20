@@ -80,7 +80,7 @@ def get_own_post():
     else:
         print 'Status code other than 200 received!'
 
-# Function to fetch recent image  posted by user by its username
+# Function to fetch recent image  posted by user with minimum no of likes
 
 def get_user_post(insta_username):
     user_id=get_user_id(insta_username)
@@ -92,8 +92,20 @@ def get_user_post(insta_username):
     user_media = requests.get(request_url).json()
     if(user_media['meta']['code']==200):
         if len(user_media['data']):
-            image_name = user_media['data'][0]['id'] + '.jpeg'
-            image_url = user_media['data'][0]['images']['standard_resolution']['url']
+            c=len(user_media['data'])
+            i=1
+            m=(user_media['data'][0]['likes']['count'])
+            c=c-1
+            while(c!=0):
+                 if(m>=(user_media['data'][i]['likes']['count'])):
+                     m=(user_media['data'][i]['likes']['count'])
+                     j=i
+                 i=i+1
+                 c=c-1
+
+            print j
+            image_name = user_media['data'][j]['id'] + '.jpeg'
+            image_url = user_media['data'][j]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url, image_name)
             print 'Your image has been downloaded!'
 
@@ -228,7 +240,6 @@ def delete_negative_comment(insta_username):
             print 'There are no existing comments on the post!'
     else:
         print 'Status code other than 200 received!'
-    new_request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
     print ' GET request url : %s' % (request_url)
 
 #Function to delete comments with particular word
@@ -252,10 +263,8 @@ def delete_using_word(insta_username):
                     del_url = (BASE_URL + 'media/%s/comments/%s?access_token=%s') % (media_id,comment_id,APP_ACCESS_TOKEN)
                     del_info = requests.delete(del_url).json()
                     if (del_info['meta']['code'] == 200):
-                        #print 'Comment deleted successfully'
                         m=m+1
                     else:
-                        #print 'Comment not deleted '
                         m=0
 
                 i=i+1
@@ -273,7 +282,6 @@ def delete_using_word(insta_username):
     else:
         print 'Status code other than 200 received!'
 
-
     print 'GET request url : %s' % (request_url)
 
 
@@ -288,7 +296,7 @@ def start_bot():
         print "a.Get your own details\n"
         print "b.Get details of a user by username\n"
         print "c.Get your own recent post\n"
-        print "d.Get recent post of a user by username\n"
+        print "d.Get recent post of a user with minimum no of likes\n"
         print "e.Get the list of user who liked user post by username\n"
         print "f.Like a post of a user by username \n"
         print "g.Get the list of comment in post by username \n"
